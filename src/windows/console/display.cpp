@@ -224,7 +224,7 @@ void update_board(State & state)
   // Adjust from y=0 being at the top of the board to being at the bottom
   size_t fruit_y = y_max - fruit->y();
   size_t fruit_previous_y = y_max - fruit->previous_y();
-  if (fruit->x() != fruit->previous_x() && fruit_y != fruit_previous_y)
+  if (fruit->x() != fruit->previous_x() || fruit_y != fruit_previous_y)
   {
     update_cell(console_id, fruit->x(), fruit_y, row_stride, FRUIT_CHAR);
   }
