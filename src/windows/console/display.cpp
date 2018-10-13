@@ -10,8 +10,15 @@
 namespace game
 {
 
+unsigned short ORIGINAL_COLOR;
+unsigned short constexpr BACKGROUND_WHITE = 
+  BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED;
+
 wchar_t constexpr SNAKE_BODY_CHAR = L'\x25CB';
+unsigned short constexpr SNAKE_COLOR = FOREGROUND_GREEN | BACKGROUND_WHITE;
 wchar_t constexpr FRUIT_CHAR = L'\x25CC';
+unsigned short constexpr FRUIT_COLOR = FOREGROUND_RED | BACKGROUND_WHITE;
+unsigned short constexpr DEFAULT_COLOR = BACKGROUND_WHITE;
 
 void clear_screen(HANDLE console_id)
 {
@@ -64,9 +71,15 @@ void set_cursor(HANDLE console_id, size_t row, size_t col)
   SetConsoleCursorPosition(console_id, coord);
 }
 
-void set_character(HANDLE console_id, size_t row, size_t col, wchar_t value)
+void set_character(
+  HANDLE console_id, 
+  size_t row, 
+  size_t col, 
+  wchar_t value, 
+  unsigned short color = DEFAULT_COLOR)
 {
   set_cursor(console_id, row, col);
+  SetConsoleTextAttribute(console_id, color);
   std::wcout << value;
 }
 
@@ -154,6 +167,12 @@ void init_display(State & state)
   HANDLE console_id = GetStdHandle(STD_OUTPUT_HANDLE);
   state.display.console_id = console_id;
 
+  BOOL success;
+  CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
+  success = GetConsoleScreenBufferInfo(console_id, &screen_buffer_info);
+  if (!success) { print_error(L"GetConsoleScreenBufferInfo"); }
+  ORIGINAL_COLOR = screen_buffer_info.wAttributes;
+
   CONSOLE_CURSOR_INFO cursor_info;
   GetConsoleCursorInfo(console_id, &cursor_info);
   cursor_info.bVisible = false;
@@ -189,13 +208,14 @@ void update_cell(
   size_t x, 
   size_t y, 
   size_t row_stride, 
-  wchar_t value)
+  wchar_t value,
+  unsigned short color = DEFAULT_COLOR)
 {
   // Top border + row + border above each row + welcome message
   size_t row = (2 * y) + 2;
   // (3 spaces per column) + dividers + initial two left spaces
   size_t col = 2 + (3 * x) + x;
-  set_character(console_id, row, col, value);
+  set_character(console_id, row, col, value, color);
   //board[jump_to_row + jump_to_col] = value;
 }
 
@@ -215,7 +235,7 @@ void update_board(State & state)
   // Adjust from y=0 being at the top of the board to being at the bottom
   size_t head_y = y_max - head.y;
   size_t removed_y = y_max - removed_position.y;
-  update_cell(console_id, head.x, head_y, row_stride, SNAKE_BODY_CHAR);
+  update_cell(console_id, head.x, head_y, row_stride, SNAKE_BODY_CHAR, SNAKE_COLOR);
   if (removed_position.valid())
   {
     update_cell(console_id, removed_position.x, removed_y, row_stride, ' ');
@@ -226,7 +246,7 @@ void update_board(State & state)
   size_t fruit_previous_y = y_max - fruit->previous_y();
   if (fruit->x() != fruit->previous_x() || fruit_y != fruit_previous_y)
   {
-    update_cell(console_id, fruit->x(), fruit_y, row_stride, FRUIT_CHAR);
+    update_cell(console_id, fruit->x(), fruit_y, row_stride, FRUIT_CHAR, FRUIT_COLOR);
   }
 }
 
@@ -243,6 +263,11 @@ void display(State & state)
   {
     update_board(state);
   }
+}
+
+void cleanup_display(State & state)
+{
+  SetConsoleTextAttribute(state.display.console_id, ORIGINAL_COLOR);
 }
 
 } // game

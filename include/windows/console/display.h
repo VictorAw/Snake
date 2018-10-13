@@ -11,6 +11,7 @@ namespace game
   void clear_screen(HANDLE console_id);
   void init_display(State & state);
   void display(State & state);
+  void cleanup_display(State & state);
 
 } // game
 
