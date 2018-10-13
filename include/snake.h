@@ -30,6 +30,7 @@ public:
 
     void increment_axis(Snake::Axis const & axis, int const & sign);
     bool operator < (Position const & other) const;
+    bool operator == (Position const & other) const;
     bool valid() const;
    
   private: 
@@ -41,13 +42,16 @@ public:
   Snake(size_t x, size_t y, size_t length);
 
   void update(State & state);
-  bool self_intersecting(); 
+  bool self_intersecting();
   void expand();
 
   Position const & head();
   std::set<Position> const & body();
 
   Position const & removed_position();
+
+  bool contains(size_t x, size_t y);
+  bool contains(Position const & position);
 
 private:
   //==========================

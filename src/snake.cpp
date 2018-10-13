@@ -42,6 +42,18 @@ bool Snake::self_intersecting()
   return body_positions_.find(positions_.front()) != body_positions_.end();
 }
 
+bool Snake::contains(size_t x, size_t y)
+{
+  Position position(x, y, true);
+  return contains(position);
+}
+
+bool Snake::contains(Snake::Position const & position)
+{
+  return (positions_.front() == position 
+       || body_positions_.find(position) != body_positions_.end());
+}
+
 void Snake::update(State & state)
 {
   time_since_last_movement_ += state.delta_time;
@@ -164,6 +176,11 @@ void Snake::Position::increment_axis(
 bool Snake::Position::operator < (Snake::Position const & other) const
 {
   return (this->x == other.x ? this->y < other.y : this->x < other.x);
+}
+
+bool Snake::Position::operator == (Snake::Position const & other) const
+{
+  return (this->x == other.x && this->y == other.y);
 }
 
 bool Snake::Position::valid() const
