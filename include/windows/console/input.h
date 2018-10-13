@@ -19,6 +19,7 @@ namespace game
 
   void init_input(State & state);
   void read_input(State & state);
+  void cleanup_input(State & state);
 
 } // game
 

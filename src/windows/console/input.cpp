@@ -83,5 +83,15 @@ void read_input(State & state)
   }
 }
 
+void cleanup_input(State & state)
+{
+  HANDLE console_id = state.input.console_id;
+
+  DWORD mode;
+  GetConsoleMode(console_id, &mode);
+  mode |= ENABLE_PROCESSED_INPUT;
+  SetConsoleMode(console_id, mode);
+}
+
 } // game
 

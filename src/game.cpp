@@ -140,6 +140,7 @@ void run(State & state)
   }
 
   cleanup_display(state);
+  cleanup_input(state);
 }
 
 void update_objects(State & state)
