@@ -11,14 +11,14 @@ namespace game
 {
 
 unsigned short ORIGINAL_COLOR;
-unsigned short constexpr BACKGROUND_WHITE = 
-  BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED;
+unsigned short constexpr FOREGROUND_WHITE = 
+  FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
 
 wchar_t constexpr SNAKE_BODY_CHAR = L'\x25CB';
-unsigned short constexpr SNAKE_COLOR = FOREGROUND_GREEN | BACKGROUND_WHITE;
+unsigned short constexpr SNAKE_COLOR = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
 wchar_t constexpr FRUIT_CHAR = L'\x25CC';
-unsigned short constexpr FRUIT_COLOR = FOREGROUND_RED | BACKGROUND_WHITE;
-unsigned short constexpr DEFAULT_COLOR = BACKGROUND_WHITE;
+unsigned short constexpr FRUIT_COLOR = FOREGROUND_RED | FOREGROUND_INTENSITY;
+unsigned short constexpr DEFAULT_COLOR = FOREGROUND_WHITE;
 
 void clear_screen(HANDLE console_id)
 {
