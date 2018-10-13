@@ -17,11 +17,15 @@ public:
 
   size_t x();
   size_t y();
+  size_t previous_x();
+  size_t previous_y();
   void respawn();
 
 private:
   size_t x_;
   size_t y_;
+  size_t previous_x_;
+  size_t previous_y_;
 
   std::uniform_int_distribution<size_t> x_distribution_;
   std::uniform_int_distribution<size_t> y_distribution_;

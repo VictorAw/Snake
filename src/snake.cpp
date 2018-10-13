@@ -7,11 +7,11 @@ namespace game
 Snake::Snake(size_t x, size_t y, size_t length)
   : forward_axis_(Snake::Axis::Y),
     forward_sign_(1),
-    movement_period_(0.1f),
+    movement_period_(0.15f),
     time_since_last_movement_(0.0f),
     expand_(false)
 {
-  Position body_segment { x, y };
+  Position body_segment(x, y, true);
   positions_.push_back(body_segment);
 
   for (size_t i=1; i<length; ++i)
@@ -32,6 +32,11 @@ std::set<Snake::Position> const & Snake::body()
   return body_positions_;
 }
 
+Snake::Position const & Snake::removed_position()
+{
+  return removed_position_;
+}
+
 bool Snake::self_intersecting()
 {
   return body_positions_.find(positions_.front()) != body_positions_.end();
@@ -40,6 +45,7 @@ bool Snake::self_intersecting()
 void Snake::update(State & state)
 {
   time_since_last_movement_ += state.delta_time;
+  
   KeyboardState const & keyboard = state.input.keyboard;
 
   if (keyboard.left_pressed || keyboard.a_pressed)
@@ -75,11 +81,13 @@ void Snake::move_forward()
  
   if (!expand_) 
   {
+    removed_position_ = positions_.back();
     body_positions_.erase(positions_.back());
     positions_.pop_back();
   }
   else
   {
+    removed_position_.valid_ = false;
     expand_ = false;
   }
 }
@@ -125,6 +133,20 @@ void Snake::expand()
   expand_ = true;
 }
 
+Snake::Position::Position()
+{
+  x = 0;
+  y = 0;
+  valid_ = false;
+}
+
+Snake::Position::Position(size_t x, size_t y, bool valid)
+{
+  this->x = x;
+  this->y = y;
+  valid_ = valid;
+}
+
 void Snake::Position::increment_axis(
   Snake::Axis const & axis, 
   int const & sign)
@@ -142,6 +164,11 @@ void Snake::Position::increment_axis(
 bool Snake::Position::operator < (Snake::Position const & other) const
 {
   return (this->x == other.x ? this->y < other.y : this->x < other.x);
+}
+
+bool Snake::Position::valid() const
+{
+  return valid_;
 }
 
 } // game

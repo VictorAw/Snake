@@ -21,11 +21,21 @@ public:
 
   struct Position
   {
+  public:
+    Position();
+    Position(size_t x, size_t y, bool valid);
+
     size_t x;
     size_t y;
 
     void increment_axis(Snake::Axis const & axis, int const & sign);
     bool operator < (Position const & other) const;
+    bool valid() const;
+   
+  private: 
+    bool valid_;
+
+    friend class Snake;
   };
 
   Snake(size_t x, size_t y, size_t length);
@@ -36,6 +46,8 @@ public:
 
   Position const & head();
   std::set<Position> const & body();
+
+  Position const & removed_position();
 
 private:
   //==========================
@@ -49,9 +61,13 @@ private:
 
   //==========================
   // Variables
-
-  std::deque<Position> positions_; // Positions of each body segment
+  
+  // Positions of each body segment
+  std::deque<Position> positions_; 
   std::set<Position> body_positions_;
+
+  // Diff of the current state after forward movement
+  Position removed_position_;
 
   Axis forward_axis_; // X/Y
   int forward_sign_; // Positive/Negative
