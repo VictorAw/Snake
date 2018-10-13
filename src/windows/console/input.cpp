@@ -8,7 +8,9 @@ namespace game
 
 void init_input(State & state)
 {
-  state.input.console_id = GetStdHandle(STD_INPUT_HANDLE);
+  HANDLE console_id = GetStdHandle(STD_INPUT_HANDLE);
+  state.input.console_id = console_id;
+
   state.input.keyboard.left_pressed = false;
   state.input.keyboard.right_pressed = false;
   state.input.keyboard.up_pressed = false;
@@ -17,6 +19,11 @@ void init_input(State & state)
   state.input.keyboard.a_pressed = false;
   state.input.keyboard.s_pressed = false;
   state.input.keyboard.d_pressed = false;
+
+  DWORD mode;
+  GetConsoleMode(console_id, &mode);
+  mode &= ~ENABLE_PROCESSED_INPUT;
+  SetConsoleMode(console_id, mode);
 }
 
 void handle_key_event(State & state, INPUT_RECORD const & event)
@@ -48,6 +55,16 @@ void handle_key_event(State & state, INPUT_RECORD const & event)
       break;
     case 0x44: // D
       keyboard.d_pressed = event.Event.KeyEvent.bKeyDown;
+      break;
+    case 0x43: // C
+      int ctrl_key_state = event.Event.KeyEvent.dwControlKeyState;
+      int ctrl_pressed = ctrl_key_state & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED);
+      if (event.Event.KeyEvent.bKeyDown && ctrl_pressed)
+      {
+        // Exit the game immediately
+        state.game_over = true;
+        state.running = false;
+      }
       break;
   }
 }

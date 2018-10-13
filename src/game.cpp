@@ -118,6 +118,13 @@ void run(State & state)
     previous_frame_time = now;
 
     read_input(state);
+    // Exit event was read from input, user wants to exit without finishing 
+    // the game 
+    if (!state.running) 
+    {
+      break;
+    }
+
     update_objects(state);
     handle_collisions(state);
     display(state);
@@ -131,6 +138,8 @@ void run(State & state)
       state.running = false;
     }
   }
+
+  cleanup_display(state);
 }
 
 void update_objects(State & state)
@@ -161,6 +170,18 @@ void handle_collisions(State & state)
   {
     snake->expand();
     fruit->respawn();
+
+    // For now, we will just constantly re-generate new numbers if the
+    // selected position is occupied. Eventually we'll want to prevent
+    // the selection of occupied positions
+    bool replace_history = true;
+    fruit->respawn(replace_history); // Update the stored previous position
+    bool same_position = 
+      fruit->x() == fruit->previous_x() && fruit->y() == fruit->previous_y();
+    while (same_position || snake->contains(fruit->x(), fruit->y()))
+    {
+      fruit->respawn(!replace_history); 
+    }
   }
 }
 
