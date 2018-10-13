@@ -19,7 +19,9 @@ public:
   size_t y();
   size_t previous_x();
   size_t previous_y();
+
   void respawn();
+  void respawn(bool replace_history);
 
 private:
   size_t x_;
