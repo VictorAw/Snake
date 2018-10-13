@@ -54,7 +54,7 @@ void Snake::update(State & state)
   {
     turn_up();
   }
-  else if (keyboard.down_pressed || keyboard.d_pressed)
+  else if (keyboard.down_pressed || keyboard.s_pressed)
   {
     turn_down();
   }
