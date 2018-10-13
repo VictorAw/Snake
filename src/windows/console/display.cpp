@@ -199,26 +199,6 @@ void update_cell(
   //board[jump_to_row + jump_to_col] = value;
 }
 
-void clear_board(State & state)
-{
-  HANDLE console_id = state.display.console_id;
-  set_cursor(console_id, 0, 0);
-
-  size_t width = state.board_width;
-  size_t height = state.board_height;
-
-  size_t row_stride = state.display.row_stride;
-  std::wstring & board = state.display.board;
-
-  for (size_t i=0; i<height; ++i)
-  {
-    for (size_t j=0; j<width; ++j)
-    {
-      update_cell(console_id, j, i, row_stride, ' ');
-    }
-  }
-}
-
 void update_board(State & state)
 {
   HANDLE console_id = state.display.console_id;
@@ -231,26 +211,22 @@ void update_board(State & state)
   std::wstring & board = state.display.board;
 
   Snake::Position const & head = snake->head();
+  Snake::Position const & removed_position = snake->removed_position();
   // Adjust from y=0 being at the top of the board to being at the bottom
   size_t head_y = y_max - head.y;
-  std::set<Snake::Position> const & body = snake->body();
+  size_t removed_y = y_max - removed_position.y;
   update_cell(console_id, head.x, head_y, row_stride, SNAKE_BODY_CHAR);
-  for (Snake::Position const & body_segment : body)
+  if (removed_position.valid())
   {
-    // Adjust from y=0 being at the top of the board to being at the bottom
-    size_t body_segment_y = y_max - body_segment.y;
-    update_cell(
-      console_id,
-      body_segment.x, 
-      body_segment_y,
-      row_stride, 
-      SNAKE_BODY_CHAR
-    );
+    update_cell(console_id, removed_position.x, removed_y, row_stride, ' ');
   }
 
   // Adjust from y=0 being at the top of the board to being at the bottom
   size_t fruit_y = y_max - fruit->y();
-  update_cell(console_id, fruit->x(), fruit_y, row_stride, FRUIT_CHAR);
+  if (fruit->x() != fruit->previous_x() && fruit_y != fruit_previous_y)
+  {
+    update_cell(console_id, fruit->x(), fruit_y, row_stride, FRUIT_CHAR);
+  }
 }
 
 void display(State & state)
@@ -264,7 +240,6 @@ void display(State & state)
   }
   else
   {
-    clear_board(state);
     update_board(state);
   }
 }
